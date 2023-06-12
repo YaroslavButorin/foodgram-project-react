@@ -77,14 +77,14 @@ class RecipeViewSet(viewsets.ModelViewSet):
             else:
                 final_list[name]['amount'] += item[2]
         pdfmetrics.registerFont(
-            TTFont('SanghaKali-Regular', 'SanghaKali-Regular.ttf', 'UTF-8'))
+            TTFont('font', 'font.ttf', 'UTF-8'))
         response = HttpResponse(content_type='application/pdf')
         response['Content-Disposition'] = ('attachment; '
                                            'filename="shopping_list.pdf"')
         page = canvas.Canvas(response)
-        page.setFont('SanghaKali-Regular', size=24)
+        page.setFont('font', size=24)
         page.drawString(200, 800, 'Список ингредиентов')
-        page.setFont('SanghaKali-Regular', size=16)
+        page.setFont('font', size=16)
         height = 750
         for i, (name, data) in enumerate(final_list.items(), 1):
             page.drawString(75, height, (f'<{i}> {name} - {data["amount"]}, '
