@@ -8,8 +8,8 @@ services:
       - ./.env
 
   backend:
-    #image: yaroslavbutorin/foodgram-project
-    build: ../backend
+    image: yaroslavbutorin/foodgram-project
+    #build: ../backend
     restart: always
     volumes:
       - static_value:/code/static/
@@ -20,8 +20,8 @@ services:
       - ./.env
 
   frontend:
-    #image: yaroslavbutorin/foodgram_frontend
-    build: ../frontend
+    image: yaroslavbutorin/foodgram_frontend
+    #build: ../frontend
     volumes:
       - ../frontend/:/app/result_build/
     depends_on:
