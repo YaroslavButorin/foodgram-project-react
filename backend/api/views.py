@@ -48,7 +48,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             return self.add_obj(Favorite, request.user, pk)
         elif request.method == 'DELETE':
             return self.delete_obj(Favorite, request.user, pk)
-        return None
+
 
     @action(detail=True, methods=['post', 'delete'],
             permission_classes=[IsAuthenticated])
