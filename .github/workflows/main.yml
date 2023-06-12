@@ -47,6 +47,7 @@ jobs:
           context: ./backend
           file: ./backend/Dockerfile
           push: true
+          tags: ${{ secrets.DOCKER_USERNAME }}/foodgram_frontend:latest
           tags: ${{ secrets.DOCKER_USERNAME }}/foodgram-project:latest
 
   deploy:
@@ -61,6 +62,7 @@ jobs:
           username: ${{ secrets.USER }}
           password: ${{ secrets.PASSWORD }}
           script: |
+            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/foodgram_frontend
             sudo docker pull ${{ secrets.DOCKER_USERNAME }}/foodgram-project
             sudo docker-compose stop
             sudo docker-compose rm backend
