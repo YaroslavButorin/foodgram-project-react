@@ -74,7 +74,6 @@ class RecipeSerializer(serializers.ModelSerializer):
                 'ingredients': 'Нужен хоть один ингредиент для рецепта'})
         ingredient_list = []
         for ingredient_item in ingredients:
-            #ingredient = get_object_or_404(Ingredient,id=ingredient_item['id'])
             if ingredient_item in ingredient_list:
                 raise serializers.ValidationError('Ингредиенты должны '
                                                   'быть уникальными')
@@ -86,6 +85,7 @@ class RecipeSerializer(serializers.ModelSerializer):
                 })
         data['ingredients'] = ingredients
         return data
+
     def create_ingredients(self, ingredients, recipe):
         IngredientAmount.objects.bulk_create(
             [IngredientAmount(
@@ -94,7 +94,6 @@ class RecipeSerializer(serializers.ModelSerializer):
                 amount=ingredient.get('amount')
             ) for ingredient in ingredients]
         )
-
 
     def create(self, validated_data):
         image = validated_data.pop('image')
@@ -116,26 +115,12 @@ class RecipeSerializer(serializers.ModelSerializer):
         return super().update(
             instance, validated_data)
 
-        # instance.image = validated_data.get('image', instance.image)
-        # instance.name = validated_data.get('name', instance.name)
-        # instance.text = validated_data.get('text', instance.text)
-        # instance.cooking_time = validated_data.get(
-        #     'cooking_time', instance.cooking_time
-        # )
-        # instance.tags.clear()
-        # tags_data = self.initial_data.get('tags')
-        # instance.tags.set(tags_data)
-        # IngredientAmount.objects.filter(recipe=instance).all().delete()
-        # self.create_ingredients(validated_data.get('ingredients'), instance)
-        # instance.save()
-        # return instance
-
-
     def to_representation(self, instance):
         return RecipeSerializer(
             instance,
             context={'request': self.context.get('request')}
         ).data
+
 
 class CropRecipeSerializer(serializers.ModelSerializer):
     image = Base64ImageField()

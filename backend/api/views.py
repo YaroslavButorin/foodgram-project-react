@@ -5,6 +5,7 @@ from api.pagination import LimitPageNumberPagination
 from api.permissions import IsAdminOrReadOnly, IsOwnerOrReadOnly
 from api.serializers import (CropRecipeSerializer, IngredientSerializer,
                              RecipeSerializer, TagSerializer)
+from django.db.models import Sum
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from reportlab.pdfbase import pdfmetrics
@@ -46,36 +47,36 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def favorite(self, request, pk=None):
         if request.method == 'POST':
             return self.add_obj(Favorite, request.user, pk)
-        if request.method == 'DELETE':
+        else:
             return self.delete_obj(Favorite, request.user, pk)
-        return None
 
     @action(detail=True, methods=['post', 'delete'],
             permission_classes=[IsAuthenticated])
     def shopping_cart(self, request, pk=None):
         if request.method == 'POST':
             return self.add_obj(Cart, request.user, pk)
-        if request.method == 'DELETE':
+        else:
             return self.delete_obj(Cart, request.user, pk)
-        return None
 
     @action(detail=False, methods=['get'],
             permission_classes=[IsAuthenticated])
     def download_shopping_cart(self, request):
-        final_list = {}
+        final_cart: dict = {}
         ingredients = IngredientAmount.objects.filter(
-            recipe__cart__user=request.user).values_list(
-            'ingredient__name', 'ingredient__measurement_unit',
-            'amount')
-        for item in ingredients:
-            name = item[0]
-            if name not in final_list:
-                final_list[name] = {
-                    'measurement_unit': item[1],
-                    'amount': item[2]
+            recipe__cart__user=request.user
+        ).values(
+            'ingredient__name', 'ingredient__measurement_unit'
+        ).annotate(amount=Sum('amount'))
+        for num, i in enumerate(ingredients):
+            name = i['ingredient__name']
+            if name not in final_cart:
+                final_cart[name] = {
+                    'measurement_unit': i['ingredient__measurement_unit'],
+                    'amount': i['amount']
                 }
             else:
-                final_list[name]['amount'] += item[2]
+                final_cart[name]['amount'] += i['amount']
+
         pdfmetrics.registerFont(
             TTFont('font', 'font.ttf', 'UTF-8'))
         response = HttpResponse(content_type='application/pdf')
@@ -86,7 +87,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         page.drawString(200, 800, 'Список ингредиентов')
         page.setFont('font', size=16)
         height = 750
-        for i, (name, data) in enumerate(final_list.items(), 1):
+        for i, (name, data) in enumerate(final_cart.items(), 1):
             page.drawString(75, height, (f'<{i}> {name} - {data["amount"]}, '
                                          f'{data["measurement_unit"]}'))
             height -= 25
