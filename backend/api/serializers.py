@@ -87,6 +87,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         data['ingredients'] = ingredients
         return data
 
+
     def create_ingredients(self, ingredients, recipe):
         IngredientAmount.objects.bulk_create(
             [IngredientAmount(
@@ -116,11 +117,11 @@ class RecipeSerializer(serializers.ModelSerializer):
         return super().update(
             instance, validated_data)
 
-    def to_representation(self, instance):
-        return RecipeSerializer(
-            instance,
-            context={'request': self.context.get('request')}
-        ).data
+    # def to_representation(self, instance):
+    #     return RecipeSerializer(
+    #         instance,
+    #         context={'request': self.context.get('request')}
+    #     ).data
 
 
 class CropRecipeSerializer(serializers.ModelSerializer):
