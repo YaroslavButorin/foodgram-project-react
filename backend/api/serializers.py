@@ -67,11 +67,11 @@ class RecipeSerializer(serializers.ModelSerializer):
         return Recipe.objects.filter(cart__user=user, id=obj.id).exists()
 
     def validate(self, data):
-        ingredients = data['ingredients']
+        ingredients = self.initial_data.get('ingredients')
         if not ingredients:
             raise serializers.ValidationError({
                 'ingredients': 'Нужен хоть один ингредиент для рецепта'},
-                {"123": ingredients})
+                {"123": data})
         ingredient_list = []
         for ingredient_item in ingredients:
             if ingredient_item['ingredient'] in ingredient_list:
