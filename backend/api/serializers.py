@@ -76,9 +76,10 @@ class RecipeSerializer(serializers.ModelSerializer):
         # to_representation , Михаил, Объясни пожалуйста
 
         if not ingredients:
-            raise serializers.ValidationError({
-                'ingredients': 'Нужен хоть один ингредиент для рецепта'},
-                )
+            raise serializers.ValidationError({'ingredients': 'Нужен хоть '
+                                                              'один '
+                                                              'ингредиент '
+                                                              'для рецепта'})
         ingredient_list = []
         for ingredient_item in ingredients:
             if ingredient_item in ingredient_list:
