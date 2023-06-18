@@ -66,8 +66,8 @@ class RecipeSerializer(serializers.ModelSerializer):
             return False
         return Recipe.objects.filter(cart__user=user, id=obj.id).exists()
 
-    def validate(self, data):
-        ingredients = [item for item in data]
+    def validate(self, value):
+        ingredients = [item for item in value]
         if not ingredients:
             raise serializers.ValidationError({
                 'ingredients': 'Нужен хоть один ингредиент для рецепта'})
@@ -82,8 +82,8 @@ class RecipeSerializer(serializers.ModelSerializer):
                     'ingredients': ('Убедитесь, что значение количества '
                                     'ингредиента больше 0')
                 })
-        data['ingredients'] = ingredients
-        return data
+        value['ingredients'] = ingredients
+        return value
 
     def create_ingredients(self, ingredients, recipe):
         IngredientAmount.objects.bulk_create(
