@@ -68,15 +68,22 @@ class RecipeSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         ingredients = self.initial_data.get('ingredients')
+        # initial_data - это данные ингридиентов которые мы получаем из формы
+        # в data у нас нет ещё списка ингридиентов
+        # он там появляется после сериализации формы
+        # data['ingredients'] = ingredients
+        # Так же не совсем понимаю как использовать в коде метод
+        # to_representation , Михаил, Объясни пожалуйста
+
         if not ingredients:
             raise serializers.ValidationError({
                 'ingredients': 'Нужен хоть один ингредиент для рецепта'},
-                {"123": data})
+                )
         ingredient_list = []
         for ingredient_item in ingredients:
             if ingredient_item in ingredient_list:
                 raise serializers.ValidationError('Ингредиенты должны '
-                                                  f'быть уникальными: {data}',
+                                                  f'быть уникальными',
                                                   )
             ingredient_list.append(ingredient_item)
             if int(ingredient_item['amount']) < 0:
@@ -117,10 +124,7 @@ class RecipeSerializer(serializers.ModelSerializer):
             instance, validated_data)
 
     # def to_representation(self, instance):
-    #     return RecipeSerializer(
-    #         instance,
-    #         context={'request': self.context.get('request')}
-    #     ).data
+    #     pass
 
 
 class CropRecipeSerializer(serializers.ModelSerializer):
