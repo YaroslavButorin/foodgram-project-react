@@ -1,4 +1,5 @@
 from api.models import Ingredient, IngredientAmount, Recipe, Tag
+from django.shortcuts import get_object_or_404
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
@@ -73,7 +74,8 @@ class RecipeSerializer(serializers.ModelSerializer):
                 'ingredients': 'Нужен хоть один ингредиент для рецепта'})
         ingredient_list = []
         for ingredient_item in ingredients:
-            if ingredient_item in ingredient_list:
+            ingredient = get_object_or_404(Ingredient, id=ingredient_item['id'])
+            if ingredient in ingredient_list:
                 raise serializers.ValidationError('Ингредиенты должны '
                                                   'быть уникальными')
             ingredient_list.append(ingredient_item)
