@@ -37,7 +37,6 @@ class IngredientAmountSerializer(serializers.ModelSerializer):
 
 
 class RecipeSerializer(serializers.ModelSerializer):
-    image = Base64ImageField()
     tags = TagSerializer(read_only=True, many=True)
     author = CustomUserSerializer(read_only=True)
     ingredients = IngredientAmountSerializer(
@@ -66,15 +65,13 @@ class RecipeSerializer(serializers.ModelSerializer):
             return False
         return Recipe.objects.filter(cart__user=user, id=obj.id).exists()
 
-    def validate(self, data):
-        ingredients = self.initial_data.get('ingredients')
-        # initial_data - это данные ингридиентов которые мы получаем из формы
-        # в data у нас нет ещё списка ингридиентов
-        # он там появляется после сериализации формы
-        # data['ingredients'] = ingredients
-        # Так же не совсем понимаю как использовать в коде метод
-        # to_representation , Михаил, Объясни пожалуйста
+class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
+    author = CustomUserSerializer(read_only=True)
+    ingredients = serializers.SerializerMethodField()
+    image = Base64ImageField()
 
+    def validate(self, data):
+        ingredients = [item['id'] for item in data] #data#self.initial_data.get('ingredients')
         if not ingredients:
             raise serializers.ValidationError({'ingredients': 'Нужен хоть '
                                                               'один '
@@ -92,7 +89,7 @@ class RecipeSerializer(serializers.ModelSerializer):
                     'ingredients': ('Убедитесь, что значение количества '
                                     'ингредиента больше 0')
                 })
-        data['ingredients'] = ingredients
+        #data['ingredients'] = ingredients
         return data
 
     def create_ingredients(self, ingredients, recipe):
@@ -124,9 +121,16 @@ class RecipeSerializer(serializers.ModelSerializer):
         return super().update(
             instance, validated_data)
 
-    # def to_representation(self, instance):
-    #     pass
+    def to_representation(self, instance):
+        serializer = RecipeSerializer(
+            instance,
+            context={'request': self.context.get('request')}
+        )
 
+        return serializer.data
+    class Meta:
+        model = Recipe
+        exclude = ('pub_date',)
 
 class CropRecipeSerializer(serializers.ModelSerializer):
     image = Base64ImageField()
