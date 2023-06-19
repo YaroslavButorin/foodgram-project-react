@@ -108,6 +108,7 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
         )
 
     def create(self, validated_data):
+        author = self.context.get('request').user
         ingredients_data = validated_data.pop('ingredients')
         recipe = Recipe.objects.create(author=author, **validated_data)
         tags_data = self.initial_data.get('tags')
@@ -140,7 +141,7 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
 
 
 class CropRecipeSerializer(serializers.ModelSerializer):
-    image = Base64ImageField()
+    # image = Base64ImageField()
 
     class Meta:
         model = Recipe
