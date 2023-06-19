@@ -65,13 +65,15 @@ class RecipeSerializer(serializers.ModelSerializer):
             return False
         return Recipe.objects.filter(cart__user=user, id=obj.id).exists()
 
+
 class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
     author = CustomUserSerializer(read_only=True)
     ingredients = serializers.SerializerMethodField()
     image = Base64ImageField()
 
     def validate(self, data):
-        ingredients = [item['id'] for item in data] #data#self.initial_data.get('ingredients')
+        ingredients = [item['id'] for item in
+                       data]  # data#self.initial_data.get('ingredients')
         if not ingredients:
             raise serializers.ValidationError({'ingredients': 'Нужен хоть '
                                                               'один '
@@ -89,7 +91,7 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
                     'ingredients': ('Убедитесь, что значение количества '
                                     'ингредиента больше 0')
                 })
-        #data['ingredients'] = ingredients
+        # data['ingredients'] = ingredients
         return data
 
     def create_ingredients(self, ingredients, recipe):
@@ -128,9 +130,11 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
         )
 
         return serializer.data
+
     class Meta:
         model = Recipe
         exclude = ('pub_date',)
+
 
 class CropRecipeSerializer(serializers.ModelSerializer):
     image = Base64ImageField()
