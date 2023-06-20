@@ -68,25 +68,17 @@ class RecipeSerializer(serializers.ModelSerializer):
         return Recipe.objects.filter(cart__user=user, id=obj.id).exists()
 
 
-class IngredientRecipeCreateSerializer(serializers.ModelSerializer):
-    amount = serializers.IntegerField(write_only=True)
-    id = serializers.IntegerField(write_only=True)
-
-    class Meta:
-        model = Ingredient
-        fields = [
-            'id',
-            'amount'
-        ]
-
-
 class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
     author = CustomUserSerializer(read_only=True)
     tags = serializers.PrimaryKeyRelatedField(
         queryset=Tag.objects.all(),
         many=True
     )
-    ingredients = IngredientRecipeCreateSerializer(many=True)
+    ingredients = IngredientAmountSerializer(
+        source='ingredientamount_set',
+        many=True,
+        read_only=True,
+    )
     image = Base64ImageField()
 
     def validate(self, data):
