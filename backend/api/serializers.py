@@ -79,7 +79,7 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         ingredients = [item['id'] for item in
-                       data]  # data#self.initial_data.get('ingredients')
+                       data]
         if not ingredients:
             raise serializers.ValidationError({'ingredients': 'Нужен хоть '
                                                               'один '
@@ -97,7 +97,6 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
                     'ingredients': ('Убедитесь, что значение количества '
                                     'ингредиента больше 0')
                 })
-        # data['ingredients'] = ingredients
         return data
 
     def create_ingredients(self, ingredients, recipe):
