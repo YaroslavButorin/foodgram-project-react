@@ -142,7 +142,8 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Recipe
-        exclude = ('pub_date',)
+        fields = ('ingredients', 'tags', 'image',
+                  'name', 'text', 'cooking_time', 'author')
 
 
 class CropRecipeSerializer(serializers.ModelSerializer):
