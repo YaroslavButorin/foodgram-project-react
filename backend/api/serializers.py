@@ -67,14 +67,23 @@ class RecipeSerializer(serializers.ModelSerializer):
             return False
         return Recipe.objects.filter(cart__user=user, id=obj.id).exists()
 
+class IngredientRecipeCreateSerializer(serializers.ModelSerializer):
+    amount = serializers.IntegerField(write_only=True)
+    id = serializers.IntegerField(write_only=True)
 
+    class Meta:
+        model = Ingredient
+        fields = [
+            'id',
+            'amount'
+        ]
 class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
     author = CustomUserSerializer(read_only=True)
     tags = serializers.PrimaryKeyRelatedField(
         queryset=Tag.objects.all(),
         many=True
     )
-    ingredients = IngredientSerializer(many=True)
+    ingredients = IngredientRecipeCreateSerializer(many=True)
     image = Base64ImageField()
 
     def validate(self, data):
