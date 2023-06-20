@@ -65,7 +65,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             recipe__cart__user=request.user
         ).values(
             'ingredient__name', 'ingredient__measurement_unit'
-        ).annotate(amount=Sum('amount'))
+        ).annotate(sum=Sum('amount'))
         for num, i in enumerate(ingredients):
             name = i['ingredient__name']
             if name not in final_cart:
