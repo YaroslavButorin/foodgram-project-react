@@ -16,7 +16,8 @@ from api.models import (Cart, Favorite, Ingredient, IngredientAmount, Recipe,
 from api.pagination import LimitPageNumberPagination
 from api.permissions import IsAdminOrReadOnly, IsOwnerOrReadOnly
 from api.serializers import (CropRecipeSerializer, IngredientSerializer,
-                             RecipeSerializer, TagSerializer)
+                             RecipeSerializer, RecipeCreateUpdateSerializer,
+                             TagSerializer)
 
 
 class TagsViewSet(ReadOnlyModelViewSet):
@@ -39,6 +40,11 @@ class RecipeViewSet(viewsets.ModelViewSet):
     pagination_class = LimitPageNumberPagination
     filter_class = AuthorAndTagFilter
     permission_classes = [IsOwnerOrReadOnly]
+
+    def get_serializer_class(self):
+        if self.request.method == 'GET':
+            return RecipeSerializer
+        return RecipeCreateUpdateSerializer
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
