@@ -14,16 +14,9 @@ class TagSerializer(serializers.ModelSerializer):
 
 
 class IngredientSerializer(serializers.ModelSerializer):
-    amount = serializers.IntegerField(write_only=True)
-    id = serializers.IntegerField(write_only=True)
-
     class Meta:
         model = Ingredient
-        fields = [
-            'id',
-            'amount'
-        ]
-
+        fields = '__all__'
 
 
 class IngredientAmountSerializer(serializers.ModelSerializer):
