@@ -74,7 +74,10 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
         queryset=Tag.objects.all(),
         many=True
     )
-    ingredients = IngredientSerializer(many=True)
+    ingredients = IngredientAmountSerializer(
+        many=True,
+        read_only=True,
+    )
     image = Base64ImageField()
 
     def validate(self, data):
