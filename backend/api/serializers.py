@@ -14,9 +14,16 @@ class TagSerializer(serializers.ModelSerializer):
 
 
 class IngredientSerializer(serializers.ModelSerializer):
+    amount = serializers.IntegerField(write_only=True)
+    id = serializers.IntegerField(write_only=True)
+
     class Meta:
         model = Ingredient
-        fields = '__all__'
+        fields = [
+            'id',
+            'amount'
+        ]
+
 
 
 class IngredientAmountSerializer(serializers.ModelSerializer):
@@ -74,10 +81,7 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
         queryset=Tag.objects.all(),
         many=True
     )
-    ingredients = IngredientAmountSerializer(
-        many=True,
-        read_only=True,
-    )
+    ingredients = IngredientSerializer(many=True)
     image = Base64ImageField()
 
     def validate(self, data):
