@@ -80,7 +80,7 @@ class RecipeSerializer(serializers.ModelSerializer):
 
 class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
     author = CustomUserSerializer(read_only=True)
-    tags = TagSerializer(read_only=True, many=True)
+    tags = TagSerializer(many=True)
     ingredients = IngredientInRecipeWriteSerializer(
         many=True,
     )
@@ -134,8 +134,7 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
         instance.ingredients.clear()
         self.create_ingredients(recipe=instance,
                                 ingredients=ingredients)
-        instance.tags.set(
-            validated_data.pop('tags'))
+        instance.tags.set(validated_data.pop('tags'))
         return super().update(
             instance, validated_data)
 
