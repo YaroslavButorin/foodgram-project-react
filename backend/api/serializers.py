@@ -21,35 +21,35 @@ class IngredientSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class IngredientAmountSerializer(serializers.ModelSerializer):
-    id = serializers.ReadOnlyField(source='ingredient.id')
-    name = serializers.ReadOnlyField(source='ingredient.name')
-    measurement_unit = serializers.ReadOnlyField(
-        source='ingredient.measurement_unit'
-    )
+# class IngredientAmountSerializer(serializers.ModelSerializer):
+#     id = serializers.ReadOnlyField(source='ingredient.id')
+#     name = serializers.ReadOnlyField(source='ingredient.name')
+#     measurement_unit = serializers.ReadOnlyField(
+#         source='ingredient.measurement_unit'
+#     )
+#
+#     class Meta:
+#         model = IngredientAmount
+#         fields = ('id', 'name', 'measurement_unit', 'amount')
+#         validators = [
+#             UniqueTogetherValidator(
+#                 queryset=IngredientAmount.objects.all(),
+#                 fields=['ingredient', 'recipe']
+#             )
+#         ]
+
+class IngredientInRecipeWriteSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(write_only=True)
 
     class Meta:
         model = IngredientAmount
-        fields = ('id', 'name', 'measurement_unit', 'amount')
-        validators = [
-            UniqueTogetherValidator(
-                queryset=IngredientAmount.objects.all(),
-                fields=['ingredient', 'recipe']
-            )
-        ]
-    def to_internal_value(self, data):
-        data = super().to_internal_value(data)
-        try:
-            ingredient = Ingredient.objects.get(id=data['ingredient']['id'])
-        except:
-            raise serializers.ValidationError(f'Invalid data. No such tag. {data}')
-        return ingredient, data['amount']
+        fields = ('id', 'amount')
 
 class RecipeSerializer(serializers.ModelSerializer):
     image = Base64ImageField()
     tags = TagSerializer(read_only=True, many=True)
     author = CustomUserSerializer(read_only=True)
-    ingredients = IngredientAmountSerializer(
+    ingredients = IngredientInRecipeWriteSerializer(
         source='ingredientamount_set',
         many=True,
         read_only=True,
@@ -79,7 +79,7 @@ class RecipeSerializer(serializers.ModelSerializer):
 class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
     author = CustomUserSerializer(read_only=True)
     tags = TagSerializer(read_only=True, many=True)
-    ingredients = IngredientAmountSerializer(
+    ingredients = IngredientInRecipeWriteSerializer(
         many=True,
     )
 
