@@ -21,29 +21,13 @@ class IngredientSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-# class IngredientAmountSerializer(serializers.ModelSerializer):
-#     id = serializers.ReadOnlyField(source='ingredient.id')
-#     name = serializers.ReadOnlyField(source='ingredient.name')
-#     measurement_unit = serializers.ReadOnlyField(
-#         source='ingredient.measurement_unit'
-#     )
-#
-#     class Meta:
-#         model = IngredientAmount
-#         fields = ('id', 'name', 'measurement_unit', 'amount')
-#         validators = [
-#             UniqueTogetherValidator(
-#                 queryset=IngredientAmount.objects.all(),
-#                 fields=['ingredient', 'recipe']
-#             )
-#         ]
-
 class IngredientInRecipeWriteSerializer(serializers.ModelSerializer):
-    id = serializers.IntegerField(source='ingredient.id')
+    id = serializers.PrimaryKeyRelatedField(queryset=Ingredient.objects.all())
     name = serializers.ReadOnlyField(source='ingredient.name')
     measurement_unit = serializers.ReadOnlyField(
-             source='ingredient.measurement_unit'
-         )
+        source='ingredient.measurement_unit'
+    )
+
     class Meta:
         model = IngredientAmount
         fields = ('id', 'name', 'measurement_unit', 'amount')
@@ -115,7 +99,7 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
     def create_ingredients(self, ingredients, recipe):
         IngredientAmount.objects.bulk_create(
             [IngredientAmount(
-                ingredient=Ingredient.objects.get(id=ingredient.get('id')),
+                ingredient=ingredient.get('id'),
                 recipe=recipe,
                 amount=ingredient.get('amount')
             ) for ingredient in ingredients]
