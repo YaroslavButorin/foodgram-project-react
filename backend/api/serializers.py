@@ -14,6 +14,8 @@ class TagSerializer(serializers.ModelSerializer):
 
 
 class IngredientSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField()
+
     class Meta:
         model = Ingredient
         fields = '__all__'
@@ -71,11 +73,13 @@ class RecipeSerializer(serializers.ModelSerializer):
 class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
     author = CustomUserSerializer(read_only=True)
     tags = TagSerializer(read_only=True, many=True)
-    ingredients = IngredientAmountSerializer(
-        source='ingredientamount_set',
-        many=True,
-        read_only=True,
-    )
+    ingredients = IngredientSerializer(many=True)
+    # ingredients = IngredientAmountSerializer(
+    #     source='ingredientamount_set',
+    #     many=True,
+    #     read_only=True,
+    # )
+
     image = Base64ImageField()
 
     def validate(self, data):
@@ -92,7 +96,7 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError(
                     f'Ингредиенты должны {data.get("ingredients")} '
                     'быть уникальными',
-                    )
+                )
             ingredient_list.append(ingredient_item)
             if int(ingredient_item['amount']) < 0:
                 raise serializers.ValidationError({
@@ -143,6 +147,14 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
         model = Recipe
         fields = ('ingredients', 'tags', 'image',
                   'name', 'text', 'cooking_time', 'author')
+        extra_kwargs = {
+            'ingredients': {'required': True, 'allow_blank': False},
+            'tags': {'required': True, 'allow_blank': False},
+            'name': {'required': True, 'allow_blank': False},
+            'text': {'required': True, 'allow_blank': False},
+            'image': {'required': True, 'allow_blank': False},
+            'cooking_time': {'required': True},
+        }
 
 
 class CropRecipeSerializer(serializers.ModelSerializer):
