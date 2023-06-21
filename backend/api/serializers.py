@@ -40,17 +40,20 @@ class IngredientSerializer(serializers.ModelSerializer):
 
 class IngredientInRecipeWriteSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(write_only=True)
+    name = serializers.ReadOnlyField(source='ingredient.name')
 
     class Meta:
         model = IngredientAmount
-        fields = '__all__'
+        fields = ('id', 'name', 'amount')
 
 class RecipeSerializer(serializers.ModelSerializer):
     image = Base64ImageField()
     tags = TagSerializer(read_only=True, many=True)
     author = CustomUserSerializer(read_only=True)
     ingredients = IngredientInRecipeWriteSerializer(
+        source='ingredientamount_set',
         many=True,
+        read_only=True,
     )
     is_favorited = serializers.SerializerMethodField()
     is_in_shopping_cart = serializers.SerializerMethodField()
@@ -116,6 +119,11 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
         )
 
     def create(self, validated_data):
+        if validated_data:
+            raise serializers.ValidationError(
+                f'Ингредиенты должны {validated_data} '
+                'быть уникальными',
+            )
         image = validated_data.pop('image')
         ingredients_data = validated_data.pop('ingredients')
         recipe = Recipe.objects.create(image=image, **validated_data)
