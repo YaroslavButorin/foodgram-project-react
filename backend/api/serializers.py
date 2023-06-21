@@ -89,9 +89,10 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
         ingredient_list = []
         for ingredient_item in ingredients:
             if ingredient_item in ingredient_list:
-                raise serializers.ValidationError(f'Ингредиенты должны {data["ingredients"]} '
-                                                  'быть уникальными',
-                                                  )
+                raise serializers.ValidationError(
+                    f'Ингредиенты должны {data.get("ingredients")} '
+                    'быть уникальными',
+                    )
             ingredient_list.append(ingredient_item)
             if int(ingredient_item['amount']) < 0:
                 raise serializers.ValidationError({
@@ -118,7 +119,6 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
         recipe.tags.set(tags_data)
         self.create_ingredients(ingredients_data, recipe)
         return recipe
-
 
     def update(self, instance, validated_data):
         if 'ingredients' in validated_data:
