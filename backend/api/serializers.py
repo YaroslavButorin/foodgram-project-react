@@ -37,7 +37,13 @@ class IngredientAmountSerializer(serializers.ModelSerializer):
                 fields=['ingredient', 'recipe']
             )
         ]
-
+    def to_internal_value(self, data):
+        data = super().to_internal_value(data)
+        try:
+            ingredient = Ingredient.objects.get(id=data['ingredient']['id'])
+        except:
+            raise serializers.ValidationError('Invalid data. No such tag.')
+        return ingredient, data['amount']
 
 class RecipeSerializer(serializers.ModelSerializer):
     image = Base64ImageField()
@@ -74,9 +80,7 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
     author = CustomUserSerializer(read_only=True)
     tags = TagSerializer(read_only=True, many=True)
     ingredients = IngredientAmountSerializer(
-        source='ingredientamount_set',
         many=True,
-        read_only=False,
     )
 
     image = Base64ImageField()
