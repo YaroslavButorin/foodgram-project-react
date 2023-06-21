@@ -73,12 +73,11 @@ class RecipeSerializer(serializers.ModelSerializer):
 class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
     author = CustomUserSerializer(read_only=True)
     tags = TagSerializer(read_only=True, many=True)
-    ingredients = IngredientSerializer(many=True)
-    # ingredients = IngredientAmountSerializer(
-    #     source='ingredientamount_set',
-    #     many=True,
-    #     read_only=True,
-    # )
+    ingredients = IngredientAmountSerializer(
+        source='ingredientamount_set',
+        many=True,
+        read_only=True,
+    )
 
     image = Base64ImageField()
 
@@ -94,7 +93,7 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
         for ingredient_item in ingredients:
             if ingredient_item in ingredient_list:
                 raise serializers.ValidationError(
-                    f'Ингредиенты должны {data.get("ingredients")} '
+                    f'Ингредиенты должны '
                     'быть уникальными',
                 )
             ingredient_list.append(ingredient_item)
