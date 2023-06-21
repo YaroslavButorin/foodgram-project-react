@@ -76,7 +76,7 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
     ingredients = IngredientAmountSerializer(
         source='ingredientamount_set',
         many=True,
-        read_only=True,
+        read_only=False,
     )
 
     image = Base64ImageField()
