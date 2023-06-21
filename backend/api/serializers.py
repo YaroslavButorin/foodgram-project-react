@@ -111,12 +111,17 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
         return data
 
     def create_ingredients(self, ingredients, recipe):
+        if ingredients:
+            raise serializers.ValidationError(
+                f'Ингредиенты должны {ingredients} '
+                'быть уникальными',
+            )
         IngredientAmount.objects.bulk_create(
             [IngredientAmount(
-                ingredient=ingredient,
+                ingredient=ingredient.get('id'),
                 recipe=recipe,
-                amount=amount
-            ) for ingredient, amount in ingredients]
+                amount=ingredient.get('amount')
+            ) for ingredient in ingredients]
         )
 
     def create(self, validated_data):
