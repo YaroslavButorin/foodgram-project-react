@@ -43,16 +43,14 @@ class IngredientInRecipeWriteSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = IngredientAmount
-        fields = ('id', 'amount')
+        fields = '__all__'
 
 class RecipeSerializer(serializers.ModelSerializer):
     image = Base64ImageField()
     tags = TagSerializer(read_only=True, many=True)
     author = CustomUserSerializer(read_only=True)
     ingredients = IngredientInRecipeWriteSerializer(
-        source='ingredientamount_set',
         many=True,
-        read_only=True,
     )
     is_favorited = serializers.SerializerMethodField()
     is_in_shopping_cart = serializers.SerializerMethodField()
@@ -106,7 +104,6 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
                     'ingredients': ('Убедитесь, что значение количества '
                                     'ингредиента больше 0')
                 })
-        #data['ingredients'] = ingredients
         return data
 
     def create_ingredients(self, ingredients, recipe):
