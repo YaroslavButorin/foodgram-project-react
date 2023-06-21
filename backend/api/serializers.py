@@ -42,7 +42,7 @@ class IngredientAmountSerializer(serializers.ModelSerializer):
         try:
             ingredient = Ingredient.objects.get(id=data['ingredient']['id'])
         except:
-            raise serializers.ValidationError('Invalid data. No such tag.')
+            raise serializers.ValidationError(f'Invalid data. No such tag. {data}')
         return ingredient, data['amount']
 
 class RecipeSerializer(serializers.ModelSerializer):
