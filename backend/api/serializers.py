@@ -80,6 +80,7 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         ingredients = self.initial_data.get('ingredients')
+
         if not ingredients:
             raise serializers.ValidationError({'ingredients': 'Нужен хоть '
                                                               'один '
@@ -88,7 +89,7 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
         ingredient_list = []
         for ingredient_item in ingredients:
             if ingredient_item in ingredient_list:
-                raise serializers.ValidationError('Ингредиенты должны '
+                raise serializers.ValidationError(f'Ингредиенты должны {data["ingredients"]} '
                                                   'быть уникальными',
                                                   )
             ingredient_list.append(ingredient_item)
