@@ -13,14 +13,6 @@ class TagSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class IngredientSerializer(serializers.ModelSerializer):
-    id = serializers.IntegerField()
-
-    class Meta:
-        model = Ingredient
-        fields = '__all__'
-
-
 class IngredientAmountSerializer(serializers.ModelSerializer):
     id = serializers.ReadOnlyField(source='ingredient.id')
     name = serializers.ReadOnlyField(source='ingredient.name')
@@ -37,6 +29,12 @@ class IngredientAmountSerializer(serializers.ModelSerializer):
                 fields=['ingredient', 'recipe']
             )
         ]
+
+class IngredientInRecipeWriteSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(write_only=True)
+    class Meta:
+        model = IngredientAmount
+        fields = ('id', 'amount')
 
 
 class RecipeSerializer(serializers.ModelSerializer):
@@ -73,8 +71,7 @@ class RecipeSerializer(serializers.ModelSerializer):
 class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
     author = CustomUserSerializer(read_only=True)
     tags = TagSerializer(read_only=True, many=True)
-    ingredients = IngredientAmountSerializer(
-        source='ingredientamount_set',
+    ingredients = IngredientInRecipeWriteSerializer(
         many=True,
         read_only=False,
     )
