@@ -46,6 +46,7 @@ class IngredientInRecipeWriteSerializer(serializers.ModelSerializer):
         model = IngredientAmount
         fields = ('id', 'name', 'amount')
 
+
 class RecipeSerializer(serializers.ModelSerializer):
     image = Base64ImageField()
     tags = TagSerializer(read_only=True, many=True)
@@ -119,17 +120,13 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
         )
 
     def create(self, validated_data):
-        if validated_data:
-            raise serializers.ValidationError(
-                f'Ингредиенты должны {validated_data} '
-                'быть уникальными',
-            )
         image = validated_data.pop('image')
         ingredients_data = validated_data.pop('ingredients')
         recipe = Recipe.objects.create(image=image, **validated_data)
         tags_data = self.initial_data.get('tags')
         recipe.tags.set(tags_data)
-        self.create_ingredients(ingredients_data, recipe)
+        self.create_ingredients(recipe=recipe,
+                                ingredients=ingredients_data)
         return recipe
 
     def update(self, instance, validated_data):
