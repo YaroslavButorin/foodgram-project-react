@@ -99,7 +99,7 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
         for ingredient_item in ingredients:
             if ingredient_item in ingredient_list:
                 raise serializers.ValidationError(
-                    f'Ингредиенты должны {data} '
+                    f'Ингредиенты должны '
                     'быть уникальными',
                 )
             ingredient_list.append(ingredient_item)
@@ -112,7 +112,7 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
 
     def create_ingredients(self, ingredients, recipe):
         IngredientAmount.objects.bulk_create(
-            [IngredientAmount(
+            [Ingredient(
                 ingredient=ingredient.get('id'),
                 recipe=recipe,
                 amount=ingredient.get('amount')
