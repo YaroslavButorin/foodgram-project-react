@@ -68,7 +68,7 @@ class RecipeSerializer(serializers.ModelSerializer):
 class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
     author = CustomUserSerializer(read_only=True)
     tags = TagSerializer(read_only=True, many=True)
-    ingredients = IngredientInRecipeWriteSerializer(
+    ingredients = IngredientSerializer(
         many=True,
     )
 
