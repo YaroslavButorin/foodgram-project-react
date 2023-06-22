@@ -22,7 +22,8 @@ class IngredientSerializer(serializers.ModelSerializer):
 
 
 class IngredientInRecipeWriteSerializer(serializers.ModelSerializer):
-    id = serializers.PrimaryKeyRelatedField(queryset=Ingredient.objects.all())
+    id = serializers.PrimaryKeyRelatedField(queryset=Ingredient.objects.all(),
+                                            source='ingredient.id')
     name = serializers.ReadOnlyField(source='ingredient.name')
     measurement_unit = serializers.ReadOnlyField(
         source='ingredient.measurement_unit'
@@ -120,7 +121,7 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
             ingredients = validated_data.pop('ingredients')
             instance.ingredients.clear()
             self.create_ingredients(recipe=instance,
-                                ingredients=ingredients)
+                                    ingredients=ingredients)
         if 'tags' in validated_data:
             instance.tags.set(self.initial_data.get('tags'))
         return super().update(
