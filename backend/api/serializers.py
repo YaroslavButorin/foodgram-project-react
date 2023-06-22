@@ -70,7 +70,6 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
     tags = TagSerializer(read_only=True, many=True)
     ingredients = IngredientInRecipeWriteSerializer(
         many=True,
-        read_only=True
     )
 
     image = Base64ImageField()
@@ -118,19 +117,19 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
         return recipe
 
     def update(self, instance, validated_data):
-        # if validated_data:
-        #     raise serializers.ValidationError(
-        #         f'{self.initial_data.get("ingredients")}'
-        #     )
-        if 'ingredients' in validated_data:
-            #ingredients = validated_data.pop('ingredients')
-            instance.ingredients.clear()
-            self.create_ingredients(recipe=instance,
-                                    ingredients=validated_data.get('ingredients', instance.ingredients))
-        if 'tags' in validated_data:
-            instance.tags.set(self.initial_data.get('tags'))
-        return super().update(
-            instance, validated_data)
+        instance.image = validated_data.get('image', instance.image)
+        instance.name = validated_data.get('name', instance.name)
+        instance.text = validated_data.get('text', instance.text)
+        instance.cooking_time = validated_data.get(
+            'cooking_time', instance.cooking_time
+        )
+        instance.tags.clear()
+        tags_data = self.initial_data.get('tags')
+        instance.tags.set(tags_data)
+        IngredientAmount.objects.filter(recipe=instance).all().delete()
+        self.create_ingredients(validated_data.get('ingredients'), instance)
+        instance.save()
+        return instance
 
     def to_representation(self, instance):
         serializer = RecipeSerializer(
