@@ -72,15 +72,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
         ).values(
             'ingredient__name', 'ingredient__measurement_unit'
         ).annotate(sum=Sum('amount'))
-        for num, i in enumerate(ingredients):
-            name = i['ingredient__name']
-            if name not in final_cart:
-                final_cart[name] = {
-                    'measurement_unit': i['ingredient__measurement_unit'],
-                    'amount': i['amount']
-                }
-            else:
-                final_cart[name]['amount'] += i['amount']
 
         pdfmetrics.registerFont(
             TTFont('font', 'font.ttf', 'UTF-8'))
