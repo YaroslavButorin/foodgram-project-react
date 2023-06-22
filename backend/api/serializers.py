@@ -119,7 +119,7 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         if validated_data:
             raise serializers.ValidationError(
-                f'{validated_data}'
+                f'{self.initial_data.get("ingredients")}'
             )
         if 'ingredients' in validated_data:
             ingredients = validated_data.pop('ingredients')
