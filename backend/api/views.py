@@ -66,7 +66,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['get'],
             permission_classes=[IsAuthenticated])
     def download_shopping_cart(self, request):
-        final_cart: dict = {}
+
         ingredients = IngredientAmount.objects.filter(
             recipe__cart__user=request.user
         ).values(
@@ -83,7 +83,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         page.drawString(200, 800, 'Список ингредиентов')
         page.setFont('font', size=16)
         height = 750
-        for i, (name, data) in enumerate(final_cart.items(), 1):
+        for i, (name, data) in enumerate(ingredients.items(), 1):
             page.drawString(75, height, (f'<{i}> {name} - {data["amount"]}, '
                                          f'{data["measurement_unit"]}'))
             height -= 25
