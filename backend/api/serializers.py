@@ -98,8 +98,6 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
         return data
 
     def create_ingredients(self, ingredients, recipe):
-        if ingredients:
-            raise serializers.ValidationError(f'{ingredients}')
         IngredientAmount.objects.bulk_create(
             [IngredientAmount(
                 ingredient=ingredient.get('id'),
