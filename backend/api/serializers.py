@@ -1,8 +1,6 @@
+from api.models import Ingredient, IngredientAmount, Recipe, Tag
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
-from rest_framework.validators import UniqueTogetherValidator
-
-from api.models import Ingredient, IngredientAmount, Recipe, Tag
 from users.models import Follow
 from users.serializers import CustomUserSerializer
 
@@ -33,6 +31,7 @@ class IngredientInRecipeWriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = IngredientAmount
         fields = ('id', 'name', 'measurement_unit', 'amount')
+
 
 class IngredientInRecipeReadSerializer(serializers.ModelSerializer):
     id = serializers.ReadOnlyField(source='ingredient.id')
@@ -98,7 +97,7 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
         for ingredient_item in ingredients:
             if ingredient_item in ingredient_list:
                 raise serializers.ValidationError(
-                    f'Ингредиенты должны '
+                    'Ингредиенты должны '
                     'быть уникальными',
                 )
             ingredient_list.append(ingredient_item)
