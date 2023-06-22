@@ -1,6 +1,7 @@
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
+from django.shortcuts import get_object_or_404
 
 from api.models import Ingredient, IngredientAmount, Recipe, Tag
 from users.models import Follow
@@ -22,10 +23,8 @@ class IngredientSerializer(serializers.ModelSerializer):
 
 
 class IngredientInRecipeWriteSerializer(serializers.ModelSerializer):
-    # id = serializers.PrimaryKeyRelatedField(queryset=Ingredient.objects.all(),
-    #                                         )
-    id = serializers.ReadOnlyField(
-        source='ingredient.id')
+    id = serializers.PrimaryKeyRelatedField(queryset=Ingredient.objects.all(),
+                                            )
     name = serializers.ReadOnlyField(source='ingredient.name')
     measurement_unit = serializers.ReadOnlyField(
         source='ingredient.measurement_unit'
@@ -118,15 +117,35 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
         return recipe
 
     def update(self, instance, validated_data):
-        if 'ingredients' in validated_data:
-            ingredients = validated_data.pop('ingredients')
+        # if 'ingredients' in validated_data:
+        #     ingredients = validated_data.pop('ingredients')
+        #     instance.ingredients.clear()
+        #     self.create_ingredients(recipe=instance,
+        #                             ingredients=ingredients)
+        # if 'tags' in validated_data:
+        #     instance.tags.set(self.initial_data.get('tags'))
+        # return super().update(
+        #     instance, validated_data)
+
+        tags = validated_data.pop('tags', None)
+        if tags is not None:
+            instance.tags.set(tags)
+
+        ingredients = validated_data.pop('ingredients', None)
+        if ingredients is not None:
             instance.ingredients.clear()
-            self.create_ingredients(recipe=instance,
-                                    ingredients=ingredients)
-        if 'tags' in validated_data:
-            instance.tags.set(self.initial_data.get('tags'))
-        return super().update(
-            instance, validated_data)
+
+            for ingredient in ingredients:
+                amount = ingredient['amount']
+                ingredient = get_object_or_404(Ingredient, pk=ingredient['id'])
+
+                IngredientAmount.objects.update_or_create(
+                    recipe=instance,
+                    ingredient=ingredient,
+                    defaults={'amount': amount}
+                )
+
+        return super().update(instance, validated_data)
 
     def to_representation(self, instance):
         serializer = RecipeSerializer(
