@@ -87,7 +87,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             page.drawString(75, height, (
                 f'<{i["ingredient__name"]}>'
                 f' {i["ingredient__measurement_unit"]} '
-                f'- {i["amount"]} '
+                f'- {i["sum"]} '
             ))
             height -= 25
         page.showPage()
