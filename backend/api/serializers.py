@@ -117,15 +117,15 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
         return recipe
 
     def update(self, instance, validated_data):
-        if validated_data:
-            raise serializers.ValidationError(
-                f'{self.initial_data.get("ingredients")}'
-            )
+        # if validated_data:
+        #     raise serializers.ValidationError(
+        #         f'{self.initial_data.get("ingredients")}'
+        #     )
         if 'ingredients' in validated_data:
-            ingredients = validated_data.pop('ingredients')
+            #ingredients = validated_data.pop('ingredients')
             instance.ingredients.clear()
             self.create_ingredients(recipe=instance,
-                                    ingredients=ingredients)
+                                    ingredients=self.initial_data.get("ingredients"))
         if 'tags' in validated_data:
             instance.tags.set(self.initial_data.get('tags'))
         return super().update(
